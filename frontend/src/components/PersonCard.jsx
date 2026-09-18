@@ -1,7 +1,19 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail, Phone, CalendarDays } from "lucide-react";
+import { Mail, Phone, CalendarDays, Pencil, Trash2, Crown, ShieldCheck, UserCog, FileText, Laptop, UserRound } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+
+const ROLE_ICON = {
+  "Assistant Director": Crown,
+  Superintendent: ShieldCheck,
+  Assistant: UserCog,
+  Clerk: FileText,
+  DEO: Laptop,
+};
+
+function roleIconFor(role) {
+  return ROLE_ICON[role] || UserRound;
+}
 
 function initials(name) {
   return name
@@ -18,8 +30,9 @@ function initials(name) {
  * - Desktop: hover reveals the detail popover.
  * - Touch / keyboard: tap or focus toggles it, so it still works on mobile.
  */
-export default function PersonCard({ node, accent, testId, isLast }) {
+export default function PersonCard({ node, accent, testId, isLast, isAdmin, onEdit, onDelete }) {
   const [open, setOpen] = useState(false);
+  const RoleIcon = roleIconFor(node.role);
 
   return (
     <div
@@ -39,12 +52,17 @@ export default function PersonCard({ node, accent, testId, isLast }) {
         transition={{ type: "spring", stiffness: 300, damping: 22 }}
         className="che-card px-5 py-4 flex items-center gap-4 cursor-pointer select-none"
       >
-        <Avatar className={`w-12 h-12 ring-4 ${accent.ring} shrink-0`}>
-          <AvatarImage src={node.avatar} alt={node.name} />
-          <AvatarFallback className="bg-slate-900 text-amber-400 font-semibold text-sm">
-            {initials(node.name)}
-          </AvatarFallback>
-        </Avatar>
+        <div className="relative shrink-0">
+          <Avatar className={`w-12 h-12 ring-4 ${accent.ring}`}>
+            <AvatarImage src={node.avatar} alt={node.name} />
+            <AvatarFallback className="bg-slate-900 text-amber-400 font-semibold text-sm">
+              {initials(node.name)}
+            </AvatarFallback>
+          </Avatar>
+          <span className="che-role-badge" aria-hidden>
+            <RoleIcon className="w-2.5 h-2.5" strokeWidth={2.5} />
+          </span>
+        </div>
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center flex-wrap gap-2">
@@ -67,9 +85,34 @@ export default function PersonCard({ node, accent, testId, isLast }) {
           </p>
         </div>
 
-        <span className="text-[10px] uppercase tracking-widest text-slate-400 hidden sm:inline shrink-0">
-          {open ? "Hide" : "Details"}
-        </span>
+        {isAdmin ? (
+          <div className="flex items-center gap-1 shrink-0">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit();
+              }}
+              className="w-7 h-7 rounded-md border border-slate-200 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:border-slate-300"
+              aria-label={`Edit ${node.name}`}
+            >
+              <Pencil className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete();
+              }}
+              className="w-7 h-7 rounded-md border border-slate-200 flex items-center justify-center text-red-500 hover:text-red-600 hover:border-red-300"
+              aria-label={`Remove ${node.name}`}
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        ) : (
+          <span className="text-[10px] uppercase tracking-widest text-slate-400 hidden sm:inline shrink-0">
+            {open ? "Hide" : "Details"}
+          </span>
+        )}
       </motion.div>
 
       <AnimatePresence>
@@ -82,12 +125,17 @@ export default function PersonCard({ node, accent, testId, isLast }) {
             className="absolute z-20 right-0 sm:left-1/2 sm:-translate-x-1/2 top-full mt-2 w-[calc(100%-0rem)] sm:w-80 che-glass che-card p-4 shadow-2xl"
           >
             <div className="flex items-center gap-3">
-              <Avatar className="w-12 h-12">
-                <AvatarImage src={node.avatar} alt={node.name} />
-                <AvatarFallback className="bg-slate-900 text-amber-400">
-                  {initials(node.name)}
-                </AvatarFallback>
-              </Avatar>
+              <div className="relative shrink-0">
+                <Avatar className="w-12 h-12">
+                  <AvatarImage src={node.avatar} alt={node.name} />
+                  <AvatarFallback className="bg-slate-900 text-amber-400">
+                    {initials(node.name)}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="che-role-badge" aria-hidden>
+                  <RoleIcon className="w-2.5 h-2.5" strokeWidth={2.5} />
+                </span>
+              </div>
               <div className="min-w-0">
                 <p className="font-semibold text-slate-900 text-sm truncate">{node.name}</p>
                 <p className="text-xs text-slate-500">{node.role}</p>

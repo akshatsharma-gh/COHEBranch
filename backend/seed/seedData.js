@@ -170,4 +170,14 @@ function buildSeedBranches() {
   }));
 }
 
-module.exports = { buildSeedBranches, ROLES, BRANCH_DEFS };
+module.exports = {
+  buildSeedBranches,
+  ROLES,
+  BRANCH_DEFS,
+  BIO_FOCUS,
+  avatarFor,
+  emailFor,
+  phoneFor,
+  joinedYearFor,
+  stripTitle,
+};

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Landmark, Lock, User, ArrowRight, AlertCircle } from "lucide-react";
+import { Landmark, Lock, User, ArrowRight, AlertCircle, ArrowLeft } from "lucide-react";
 import { login, authStore } from "@/lib/api";
 import { AUTH } from "@/constants/testIds/che";
 import AnimatedBackground from "@/components/AnimatedBackground";
@@ -55,6 +55,15 @@ export default function LoginPage() {
               animate="show"
               className="w-full max-w-md"
             >
+              <motion.button
+                variants={item}
+                onClick={() => navigate("/dashboard")}
+                className="che-btn-ghost mb-8 !py-1.5 !px-3 text-xs"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                Back to branch directory
+              </motion.button>
+
               <motion.div variants={item} className="flex items-center gap-3 mb-10">
                 <div className="w-11 h-11 rounded-xl bg-slate-900 flex items-center justify-center shadow-lg shadow-slate-900/20">
                   <Landmark className="w-5 h-5 text-amber-500" strokeWidth={2} />
@@ -71,13 +80,11 @@ export default function LoginPage() {
                 variants={item}
                 className="font-display text-4xl sm:text-5xl leading-[1.05] che-gradient-text"
               >
-                Centre of Higher
-                <br />
-                Education, Haryana
+                Admin Sign-in
               </motion.h1>
               <motion.p variants={item} className="mt-4 text-slate-600 max-w-md leading-relaxed">
-                Sign in to access branch directories, hierarchies and departmental
-                records maintained by the Centre.
+                The branch directory is open to everyone. Sign in here only if you
+                need to add, edit or remove branches and officers.
               </motion.p>
 
               <motion.form

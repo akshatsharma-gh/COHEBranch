@@ -63,3 +63,18 @@ export async function fetchBranch(id) {
   const { data } = await api.get(`/branches/${id}`);
   return data.branch;
 }
+
+// ---------- Admin-only ----------
+export async function createBranch(payload) {
+  const { data } = await api.post("/branches", payload);
+  return data.branch;
+}
+
+export async function updateBranch(id, payload) {
+  const { data } = await api.put(`/branches/${id}`, payload);
+  return data.branch;
+}
+
+export async function deleteBranch(id) {
+  await api.delete(`/branches/${id}`);
+}

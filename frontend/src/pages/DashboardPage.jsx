@@ -1,12 +1,17 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
-import { Search, ChevronRight, Users, Building2, Filter } from "lucide-react";
+import { Search, ChevronRight, Users, Building2, Filter, Plus, Pencil, Trash2 } from "lucide-react";
 import AppShell from "@/components/AppShell";
 import BranchIcon from "@/components/BranchIcon";
 import PageTransition from "@/components/PageTransition";
-import { fetchBranches } from "@/lib/api";
+import IntroSequence from "@/components/IntroSequence";
+import BranchFormDialog from "@/components/admin/BranchFormDialog";
+import DeleteConfirm from "@/components/DeleteConfirm";
+import { fetchBranches, createBranch, updateBranch, deleteBranch, authStore } from "@/lib/api";
 import { DASHBOARD } from "@/constants/testIds/che";
+
+const INTRO_SEEN_KEY = "che_intro_seen";
 
 const gridVariants = {
   hidden: {},
@@ -39,21 +44,33 @@ export default function DashboardPage() {
   const [branches, setBranches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
+  const [formOpen, setFormOpen] = useState(false);
+  const [editingBranch, setEditingBranch] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const navigate = useNavigate();
+  const isAdmin = Boolean(authStore.token);
+  const cardRefs = useRef({});
+  const [showIntro, setShowIntro] = useState(() => {
+    try {
+      return sessionStorage.getItem(INTRO_SEEN_KEY) !== "1";
+    } catch {
+      return true;
+    }
+  });
+
+  const loadBranches = async () => {
+    setLoading(true);
+    try {
+      const data = await fetchBranches();
+      setBranches(data.branches);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    let alive = true;
-    (async () => {
-      setLoading(true);
-      try {
-        const data = await fetchBranches();
-        if (alive) setBranches(data.branches);
-      } finally {
-        if (alive) setLoading(false);
-      }
-    })();
-    return () => {
-      alive = false;
-    };
+    loadBranches();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const filtered = (() => {
@@ -67,11 +84,39 @@ export default function DashboardPage() {
     );
   })();
 
+  const handleCreate = () => {
+    setEditingBranch(null);
+    setFormOpen(true);
+  };
+
+  const handleEdit = (branch) => {
+    setEditingBranch(branch);
+    setFormOpen(true);
+  };
+
+  const handleSubmit = async (payload) => {
+    if (editingBranch) {
+      await updateBranch(editingBranch.id, payload);
+      await loadBranches();
+    } else {
+      const created = await createBranch(payload);
+      // Jump straight into the new branch so the admin can add officers.
+      navigate(`/branch/${created.id}`);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    await deleteBranch(deleteTarget.id);
+    setDeleteTarget(null);
+    await loadBranches();
+  };
+
   return (
     <PageTransition>
       <AppShell>
         {/* Page header */}
-        <section className="grid gap-6 md:grid-cols-[1.4fr_1fr] items-end mb-10">
+        <section className="grid gap-6 md:grid-cols-[1.4fr_1fr] items-end mb-8">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -107,20 +152,33 @@ export default function DashboardPage() {
                 value={branches.reduce((s, b) => s + b.headcount, 0)}
               />
             </div>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input
-                data-testid={DASHBOARD.searchInput}
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search branch by name or code…"
-                className="che-input pl-9"
-              />
-            </div>
           </motion.div>
         </section>
 
-        {/* Results row */}
+        {/* Search + admin actions */}
+        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between mb-5">
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <input
+              data-testid={DASHBOARD.searchInput}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search branch by name or code…"
+              className="che-input pl-9"
+            />
+          </div>
+          {isAdmin && (
+            <button
+              data-testid={DASHBOARD.addBranchButton}
+              onClick={handleCreate}
+              className="che-btn-primary !py-2.5 shrink-0"
+            >
+              <Plus className="w-4 h-4" />
+              Add branch
+            </button>
+          )}
+        </div>
+
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2 text-sm text-slate-600">
             <Filter className="w-4 h-4 text-slate-400" />
@@ -152,34 +210,107 @@ export default function DashboardPage() {
             className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
           >
             {filtered.map((b) => (
-              <BranchCard key={b.id} branch={b} />
+              <BranchCard
+                key={b.id}
+                branch={b}
+                isAdmin={isAdmin}
+                onEdit={() => handleEdit(b)}
+                onDelete={() => setDeleteTarget(b)}
+                innerRef={(el) => {
+                  cardRefs.current[b.id] = el;
+                }}
+              />
             ))}
           </motion.div>
         )}
       </AppShell>
+
+      {showIntro && !loading && branches.length > 0 && (
+        <IntroSequence
+          branches={branches}
+          getCardRect={(id) => cardRefs.current[id]?.getBoundingClientRect() || null}
+          onComplete={() => {
+            try {
+              sessionStorage.setItem(INTRO_SEEN_KEY, "1");
+            } catch {
+              /* sessionStorage unavailable — intro will just replay next time */
+            }
+            setShowIntro(false);
+          }}
+        />
+      )}
+
+      <BranchFormDialog
+        open={formOpen}
+        onOpenChange={setFormOpen}
+        initial={editingBranch}
+        onSubmit={handleSubmit}
+      />
+
+      <DeleteConfirm
+        open={Boolean(deleteTarget)}
+        onOpenChange={(v) => !v && setDeleteTarget(null)}
+        title={`Delete "${deleteTarget?.name}"?`}
+        description="This removes the branch and its entire officer hierarchy permanently. This cannot be undone."
+        onConfirm={handleDelete}
+      />
     </PageTransition>
   );
 }
 
-function BranchCard({ branch }) {
+function BranchCard({ branch, isAdmin, onEdit, onDelete, innerRef }) {
   return (
     <motion.div variants={cardVariants} whileHover={{ y: -6 }} className="h-full">
       <Link
+        ref={innerRef}
         to={`/branch/${branch.id}`}
         data-testid={DASHBOARD.branchCard(branch.id)}
         className="che-card block p-5 h-full group relative overflow-hidden"
+
       >
         <div
           className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-500 via-amber-400 to-slate-900 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
           aria-hidden
         />
+
+        {isAdmin && (
+          <div className="absolute top-3 right-3 flex items-center gap-1 z-10">
+            <button
+              data-testid={DASHBOARD.editBranchButton(branch.id)}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onEdit();
+              }}
+              className="w-7 h-7 rounded-md bg-white/90 border border-slate-200 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:border-slate-300 shadow-sm"
+              aria-label={`Edit ${branch.name}`}
+            >
+              <Pencil className="w-3.5 h-3.5" />
+            </button>
+            <button
+              data-testid={DASHBOARD.deleteBranchButton(branch.id)}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onDelete();
+              }}
+              className="w-7 h-7 rounded-md bg-white/90 border border-slate-200 flex items-center justify-center text-red-500 hover:text-red-600 hover:border-red-300 shadow-sm"
+              aria-label={`Delete ${branch.name}`}
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
+
         <div className="flex items-start justify-between">
           <div className="w-10 h-10 rounded-lg bg-slate-900 flex items-center justify-center text-amber-500 group-hover:bg-slate-800 group-hover:scale-105 transition-all duration-300">
             <BranchIcon name={branch.icon} className="w-5 h-5" />
           </div>
-          <span className="text-[10px] font-semibold tracking-widest text-slate-500 bg-slate-50 border border-slate-200 rounded-full px-2 py-0.5">
-            {branch.code}
-          </span>
+          {!isAdmin && (
+            <span className="text-[10px] font-semibold tracking-widest text-slate-500 bg-slate-50 border border-slate-200 rounded-full px-2 py-0.5">
+              {branch.code}
+            </span>
+          )}
         </div>
 
         <h3 className="mt-5 font-display text-xl text-slate-900 leading-tight">
