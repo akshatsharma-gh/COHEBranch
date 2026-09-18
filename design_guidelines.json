@@ -1,0 +1,136 @@
+{
+  "theme_and_concept": {
+    "concept": "Modern Minimalist Institutional Dashboard",
+    "theme": "Light",
+    "archetype": "SWISS & HIGH-CONTRAST + ORGANIC & EARTHY",
+    "description": "A clean, modern, and highly legible dashboard designed for a government/educational institution. It focuses on clarity, trust, and usability without feeling 'stuffy' or outdated. It leverages generous whitespace, a distinct serif for authority mixed with a geometric sans for functional UI, and subtle architectural/monumental visual motifs."
+  },
+  "typography": {
+    "headings": {
+      "family": "'Playfair Display', serif",
+      "weights": ["600", "700"],
+      "usage": "Use strictly for the main institution name (e.g., 'Centre of Higher Education, Haryana') and major page titles."
+    },
+    "body_and_ui": {
+      "family": "'Manrope', sans-serif",
+      "weights": ["400", "500", "600"],
+      "usage": "Use for all functional elements, cards, navigation, forms, and hierarchy details. Provides a clean, highly legible modern feel."
+    },
+    "guidelines": [
+      "Ensure all UI labels and secondary text use Manrope with tracking-tight or tracking-wide where appropriate.",
+      "Never center-align paragraphs; maintain strong left alignment for data.",
+      "The jump between a heading and its subheading must not exceed 2 Tailwind steps."
+    ],
+    "installation": "Ensure to add Google Fonts for Playfair Display and Manrope in the index.html or global css."
+  },
+  "colors": {
+    "primary": {
+      "DEFAULT": "#0f172a",
+      "description": "Deep Slate/Navy for authority and high contrast. Use for top nav, primary buttons, and main text."
+    },
+    "accent": {
+      "DEFAULT": "#d97706",
+      "description": "Subtle Gold/Amber for active states, highlights, and subtle institutional prestige without being overwhelming."
+    },
+    "background": {
+      "page": "#f8fafc",
+      "card": "#ffffff",
+      "login_overlay": "rgba(255, 255, 255, 0.95)"
+    },
+    "text": {
+      "primary": "#0f172a",
+      "secondary": "#475569",
+      "muted": "#94a3b8"
+    },
+    "borders": {
+      "light": "#e2e8f0",
+      "medium": "#cbd5e1"
+    }
+  },
+  "visual_enhancers": {
+    "shadows": {
+      "card": "0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05)",
+      "hover": "0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.05)"
+    },
+    "radii": {
+      "card": "0.5rem",
+      "button": "0.375rem",
+      "badge": "9999px"
+    },
+    "surfaces": {
+      "glass": "backdrop-blur-md bg-white/70 border border-white/20",
+      "solid": "bg-white border border-slate-200"
+    }
+  },
+  "layouts": {
+    "login_page": {
+      "structure": "Split layout or centered floating card over a monumental architectural background.",
+      "background_image_url": "https://images.unsplash.com/photo-1627397159237-d2acb7f500af",
+      "overlay": "A crisp white/glass panel for the login form, ensuring absolute contrast for inputs."
+    },
+    "dashboard": {
+      "navigation": "Top navigation bar (Solid white or glass) with left-aligned Playfair Display Logo/Title, and right-aligned admin profile/logout.",
+      "content_area": "Max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8.",
+      "search_bar": "Prominent, large input field at the top of the dashboard for filtering branches. Should be clean with a subtle search icon.",
+      "grid": "Bento-style or neat uniform grid (grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6) for the 33 branch cards."
+    },
+    "branch_hierarchy_page": {
+      "header": "Back button + Branch Title + subtle stats/description.",
+      "tree_structure": "A vertical organizational tree structure. Use overlapping layout or connected nodes (via CSS border lines) representing Assistant Director -> Superintendent -> Assistant -> Clerk -> DEO.",
+      "node_design": "Each node should be a clean card displaying Name (bold), Role (badge/subtext), and a subtle avatar or icon."
+    }
+  },
+  "components": {
+    "BranchCard": {
+      "description": "A clickable card representing a department.",
+      "styling": "White background, 1px border-slate-200, subtle hover lift (-translate-y-1) and shadow-lg. Include a Lucide icon related to the branch (or a generic building/folder icon), branch name, and a small 'View Hierarchy' arrow."
+    },
+    "OrgNode": {
+      "description": "Component for a single person in the hierarchy.",
+      "styling": "Rectangle card. Left side: Avatar/Initials placeholder. Right side: Name in primary text, Role in muted text. A vertical line should connect the bottom of one node to the top of the next to show hierarchy."
+    },
+    "ui_components_to_use": [
+      "Input (Search and Login)",
+      "Button (Primary action, Login, Back)",
+      "Card (Branches and Org Nodes)",
+      "Avatar (Admin profile and Org Nodes)",
+      "Badge (Roles)",
+      "DropdownMenu (For Admin Profile -> Logout)"
+    ]
+  },
+  "motion": {
+    "hover": "Transition transform and shadow on cards (duration 200ms ease-out).",
+    "page_transition": "Simple fade-in or slide-up using Framer Motion for entering the dashboard and hierarchy pages.",
+    "list_stagger": "Staggered fade-up for branch cards on load."
+  },
+  "media": {
+    "icons": "lucide-react (Landmark, Users, Search, ArrowLeft, LogOut, ChevronRight)",
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1627397159237-d2acb7f500af",
+        "category": "login_background",
+        "description": "Clean, modern monumental white pillars. Use as full-screen background with a white overlay on the login page."
+      }
+    ]
+  },
+  "instructions_to_main_agent": [
+    "Install lucide-react, framer-motion, and set up Shadcn components (card, input, button, avatar, badge, dropdown-menu).",
+    "Add 'Playfair Display' and 'Manrope' to your fonts (e.g. Google Fonts link in index.html). Set tailwind.config.js to use them.",
+    "Do not use generic blue/purple gradients. Stick strictly to the Slate/Navy, White, and Gold color palette.",
+    "For the login page, use the provided Unsplash image as a background with a heavy white or glassmorphism overlay on the side where the form sits.",
+    "Implement routing for Login -> Dashboard -> Branch Hierarchy (e.g. /login, /dashboard, /branch/:id).",
+    "Generate mock data for 33 branches (e.g., Sports, Academics, Finance, Examinations, Admissions, HR, IT, Library, Research, etc.).",
+    "Implement the search filter for the branch cards on the dashboard.",
+    "On the Branch Hierarchy page, construct the vertical tree layout carefully with CSS. The structure is fixed: Assistant Director -> Superintendent -> Assistant -> Clerk -> DEO. Mock the names as requested: Deepak sir, Dhoop singh, Anita Dhiman, Ishwar, Vijay.",
+    "Ensure all interactive elements have data-testid attributes."
+  ],
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "Do not converge toward generic 'AI slop' aesthetics.",
+    "Do not use universal transitions (transition: all).",
+    "Do not center-align the app container. Respect natural reading flow.",
+    "Use modern button styles.",
+    "Never use placeholder image services like via.placeholder.com. Use Unsplash images or pure UI.",
+    "Apply 2-3x more spacing than typical defaults.",
+    "Add proper z-index and layering to components."
+  ]
+}

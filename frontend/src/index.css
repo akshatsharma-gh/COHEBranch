@@ -1,0 +1,291 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --che-navy: #0f172a;
+    --che-navy-2: #1e293b;
+    --che-gold: #d97706;
+    --che-gold-soft: #f59e0b;
+    --che-page: #f8fafc;
+    --che-card: #ffffff;
+    --che-border: #e2e8f0;
+    --che-border-strong: #cbd5e1;
+    --che-text: #0f172a;
+    --che-text-2: #475569;
+    --che-text-muted: #94a3b8;
+
+    /* shadcn/radix component tokens (used by Avatar, HoverCard, etc.) */
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 222 47% 11%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 38 92% 50%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 222 47% 11%;
+    --radius: 0.85rem;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--che-page);
+    color: var(--che-text);
+    font-family: "Manrope", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.font-display {
+    font-family: "Playfair Display", ui-serif, Georgia, serif;
+    letter-spacing: -0.01em;
+}
+
+.font-ui {
+    font-family: "Manrope", ui-sans-serif, system-ui, sans-serif;
+}
+
+::selection {
+    background: rgba(217, 119, 6, 0.25);
+    color: var(--che-navy);
+}
+
+/* Subtle grain texture used on the login backdrop */
+.che-grain::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: radial-gradient(
+        rgba(15, 23, 42, 0.05) 1px,
+        transparent 1px
+    );
+    background-size: 3px 3px;
+    opacity: 0.35;
+    mix-blend-mode: multiply;
+}
+
+/* ---------- Ambient animated blobs (used behind login / hero sections) ---------- */
+.che-blob {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(70px);
+    will-change: transform;
+}
+
+/* ---------- Glassmorphism ---------- */
+.che-glass {
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.che-glass-dark {
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ---------- Gradient text / borders ---------- */
+.che-gradient-text {
+    background: linear-gradient(100deg, #0f172a 10%, #334155 45%, #b45309 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.che-gradient-ring {
+    position: relative;
+}
+.che-gradient-ring::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(217, 119, 6, 0.6), rgba(15, 23, 42, 0.15));
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+/* Connector lines between hierarchy nodes */
+.che-connector {
+    width: 2px;
+    background: linear-gradient(
+        180deg,
+        rgba(217, 119, 6, 0.55),
+        rgba(15, 23, 42, 0.08)
+    );
+    height: 36px;
+    margin-left: 2rem;
+    transform-origin: top;
+}
+
+.che-level-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 9999px;
+    background: var(--che-gold);
+    box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.15);
+}
+
+/* Card + hover */
+.che-card {
+    background: var(--che-card);
+    border: 1px solid var(--che-border);
+    border-radius: 1rem;
+    transition:
+        transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 260ms cubic-bezier(0.22, 1, 0.36, 1),
+        border-color 260ms ease-out;
+}
+.che-card:hover {
+    box-shadow:
+        0 20px 40px -20px rgba(15, 23, 42, 0.22),
+        0 6px 16px -6px rgba(217, 119, 6, 0.12);
+    border-color: var(--che-border-strong);
+}
+
+.che-ring-gold {
+    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.18);
+}
+
+/* Staggered entry animation (CSS fallback where framer-motion isn't used) */
+@keyframes che-rise {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.che-rise {
+    animation: che-rise 420ms ease-out both;
+}
+
+/* Login page decorative accent */
+.che-vline {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(
+        180deg,
+        transparent,
+        rgba(15, 23, 42, 0.15),
+        transparent
+    );
+}
+
+/* Focus states */
+input:focus-visible,
+button:focus-visible {
+    outline: none;
+}
+.che-input {
+    background: #fff;
+    border: 1px solid var(--che-border);
+    border-radius: 0.65rem;
+    padding: 0.75rem 0.9rem;
+    color: var(--che-text);
+    transition:
+        border-color 180ms ease,
+        box-shadow 180ms ease,
+        transform 180ms ease;
+    width: 100%;
+}
+.che-input::placeholder {
+    color: var(--che-text-muted);
+}
+.che-input:focus {
+    border-color: var(--che-navy);
+    box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.08);
+}
+
+.che-btn-primary {
+    background: linear-gradient(135deg, #0f172a, #1e293b 60%, #0f172a);
+    color: #fff;
+    border-radius: 0.65rem;
+    padding: 0.8rem 1.2rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    transition:
+        transform 180ms ease,
+        box-shadow 180ms ease,
+        filter 180ms ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+.che-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 28px -14px rgba(15, 23, 42, 0.45);
+    filter: brightness(1.08);
+}
+.che-btn-primary:active {
+    transform: translateY(0);
+}
+.che-btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    filter: none;
+}
+
+.che-btn-ghost {
+    background: transparent;
+    color: var(--che-text);
+    border: 1px solid var(--che-border);
+    border-radius: 0.65rem;
+    padding: 0.55rem 0.9rem;
+    font-weight: 500;
+    transition:
+        background 160ms ease,
+        border-color 160ms ease,
+        transform 160ms ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+.che-btn-ghost:hover {
+    background: #f1f5f9;
+    border-color: var(--che-border-strong);
+    transform: translateY(-1px);
+}
+
+/* Custom scrollbar (subtle, matches theme) */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--che-border-strong);
+    border-radius: 9999px;
+    border: 2px solid var(--che-page);
+}

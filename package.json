@@ -1,0 +1,10 @@
+{
+  "name": "centre-of-higher-education-dashboard",
+  "private": true,
+  "scripts": {
+    "backend": "npm --prefix backend start",
+    "frontend": "npm --prefix frontend start",
+    "install:backend": "npm --prefix backend install",
+    "install:frontend": "npm --prefix frontend install"
+  }
+}

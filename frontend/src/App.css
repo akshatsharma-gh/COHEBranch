@@ -1,0 +1,4 @@
+/* App-level overrides intentionally minimal — see index.css for the theme. */
+.App {
+    min-height: 100vh;
+}
